@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Contacts List</string>
+    <string name="title_activity_main">Contacts List</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="txt_location">Location:</string>
+    <string name="txt_fullName">Full Name:</string>
+    <string name="txt_SMS">SMS</string>
+    <string name="txt_Call">Call</string>
+    <string name="txt_phone_no">Phone No:</string>
+    <string name="txt_position">Position:</string>
+    <string name="txt_call_button">Call Button</string>
+    <string name="txt_send_sms">Send SMS</string>
+    <string name="txt_call_number">Call Number</string>
+    <string name="txt_select_a_group_to_send_sms">Select a Group to send SMS</string>
+    <string name="txt_select_group_and_write_your_message_here">Select Group and write your message here</string>
+    <string name="txt_send">Send</string>
+    <string name="txt_auto_fill">Auto Fill</string>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Contact List</string>
+    <string name="title_activity_main">Contacts List</string>
+    <string name="txt_fullName">ሙሉ ሰም</string>
+    <string name="txt_SMS">አጭር መልአክት</string>
+    <string name="txt_Call">ደውል</string>
+    <string name="txt_phone_no">ስልክ ቁጥር</string>
+    <string name="txt_position">ስራ</string>
+    <string name="txt_location">ቦታ</string>
+</resources>
