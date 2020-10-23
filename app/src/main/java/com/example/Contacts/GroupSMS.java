@@ -8,6 +8,8 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -16,6 +18,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,14 +33,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import static com.example.Contacts.R.id.position;
+import static com.example.Contacts.R.id.spinnerRegion;
 import static com.example.Contacts.R.id.spinnerGroup;
+import static com.example.Contacts.R.id.spinnerRegion;
+import static com.example.Contacts.R.id.spinnerZone;
 
 public class GroupSMS extends AppCompatActivity {
 
 
-    Spinner SpinnerGroup;
-    Button Btn_Back,Send_BulkSMS;
+    Spinner SpinnerGroup,SpinnerRegion,SpinnerZone;
+    Button Send_BulkSMS;
     TextView SMS;
+
+    private ContactsOpenHelper mDbOpenHelper;
+    private SimpleCursorAdapter mAdaptorPosition;
+
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -50,9 +61,16 @@ public class GroupSMS extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        mDbOpenHelper = new ContactsOpenHelper(this);
+
+        //SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_sms);
         SpinnerGroup = findViewById(spinnerGroup);
+        SpinnerRegion = findViewById(spinnerRegion);
+        SpinnerZone = findViewById(spinnerZone);
         //Btn_Back = findViewById(R.id.btn_back1);
         SMS = findViewById(R.id.SMS);
         Send_BulkSMS = findViewById(R.id.bulkEmail_send);
@@ -66,18 +84,123 @@ public class GroupSMS extends AppCompatActivity {
         Send_BulkSMS.setEnabled(false);
 
 
+/*
+//SpinnerGroup.setOnItemSelectedListener(this);
+        mAdaptorPosition = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item,null,
+                new String[]{ContactsDatabase.PositionInfoEntry.COLUMN_ACTOR_POSITION},new int[]{android.R.id.text1}, 0);
 
-        /*Btn_Back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(GroupSMS.this, MainActivity.class);
-                startActivity(intent);
+        mAdaptorPosition.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        SpinnerGroup.setAdapter(mAdaptorPosition);
+        loadPositionData();
+*/
+
+        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+
+
+
+        // **************************** load Geography ******************************************************************
+
+
+        List<String> region = new ArrayList<>();
+        Cursor curRegion = db.rawQuery("select region_name from region_info",null);
+        region.add("All Regions");
+        int n = 0;
+        while(curRegion.moveToNext())
+        {
+
+            String myList = curRegion.getString(0);
+            if (n >0) {
+                region.add(myList);
             }
-        });*/
+            n++;
+
+        }
+        curRegion.close();
+
+        ArrayAdapter<String> regionAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, region);
+
+        regionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        SpinnerRegion.setAdapter(regionAdapter);
+
+        // *************************************************************************************************************
+
+        SpinnerRegion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (SpinnerRegion.getSelectedItem() != "All Regions"){
+
+
+                    SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+
+                    List<String> zone = new ArrayList<>();
+                    Cursor curZone = db.rawQuery("select zone_name from zone_info where region_name =? ",new String[]{SpinnerRegion.getSelectedItem().toString()});
+                    zone.add("All Zones");
+                    int n = 0;
+                    while(curZone.moveToNext())
+                    {
+
+                        String myList = curZone.getString(0);
+                        if (n >0) {
+                            zone.add(myList);
+                        }
+                        n++;
+
+                    }
+                    curZone.close();
+
+                    ArrayAdapter<String> zoneAdapter = new ArrayAdapter<>(GroupSMS.this,
+                            android.R.layout.simple_spinner_item, zone);
+
+                    zoneAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    SpinnerZone.setAdapter(zoneAdapter);
+
+                }else{
+                    SpinnerZone.setAdapter(null);
+                    SpinnerGroup.setSelection(0);
+                    SMS.setEnabled(false);
+                    Send_BulkSMS.setEnabled(false);
+
+
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
 
 
 
+
+
+
+
+
+
+        List<String> list1 = new ArrayList<>();
+        Cursor res = db.rawQuery("select actor_position from actor_position",null);
+        while(res.moveToNext())
+        {
+            //String dbColumn = "actor_position";
+            //int positionIndex = res.getColumnIndex(dbColumn);
+            String myList = res.getString(0);
+            list1.add(myList);
+
+        }
+        res.close();
+
+        ArrayAdapter<String> dataAdapter1 = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, list1);
+
+        dataAdapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        SpinnerGroup.setAdapter(dataAdapter1);
+
+/*
         List<String> list = new ArrayList<>();
         list.add("Select Group");
         list.add("MFP");
@@ -97,7 +220,7 @@ public class GroupSMS extends AppCompatActivity {
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         SpinnerGroup.setAdapter(dataAdapter);
 
-
+*/
         SpinnerGroup.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -126,49 +249,111 @@ public class GroupSMS extends AppCompatActivity {
         Send_BulkSMS.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(getApplicationContext(), GroupSMS.class);
-                //PendingIntent pi = PendingIntent.getActivity(getApplicationContext(),0,intent,0);
-                //String Bulk_Phoneno = "0911183380";
-                String MyMessage = SMS.getText().toString();
+
+
+/*
+                String teamLeader = "DEC";
+                String line1 = "";
+                String bulkTelephone1 = "";
+                String MyMessage1 = SMS.getText().toString();
 
                 if(ContextCompat.checkSelfPermission(GroupSMS.this, Manifest.permission.SEND_SMS)
                         != PackageManager.PERMISSION_GRANTED){
                     ActivityCompat.requestPermissions(GroupSMS.this, new String[]{Manifest.permission.SEND_SMS},1);
                 }else{
 
-                    if(SpinnerGroup.getSelectedItem() == "VL Staff"){
-                        InputStream is = getResources().openRawResource(R.raw.vl_staff);
-                        BufferedReader reader = new BufferedReader( new InputStreamReader(is, StandardCharsets.UTF_8));
+                        SmsManager sms = SmsManager.getDefault();
 
-                        String line = "";
-                        String bulkTelephone = "";
+                        //String pos  = 'DEC';
+                        Cursor res = db.rawQuery("select * from actor_information where position = ?", new String[]{"DEC"});
+                       // rawQuery("SELECT id, name FROM people WHERE name = ? AND id = ?", new String[] {"David", "2"});
+                        while(res.moveToNext())
+                        {
+                            String dbColumn = "actor_position";
+                            int positionIndex = res.getColumnIndex(dbColumn);
+                            //res.getColumnIndex(res.getColumnName())
+                            String num = res.getString(positionIndex);
+                            sms.sendTextMessage(num, null, MyMessage1, null, null);
+                        }
+                        res.close();
+                        Toast.makeText(getApplicationContext(),"Message Sent successfully For all MFPs!",Toast.LENGTH_LONG).show();
+                        SMS.setText("");
+                    }
 
-                        try{
-                            // Step over headers
-                            reader.readLine();
 
-                            while ((line = reader.readLine()) != null){
-                                //split by ','
-                                String[] tokens = line.split(",");
 
-                                //read the data
+*/
 
-                                bulkTelephone =  tokens[3] ;
 
-                                SmsManager sms = SmsManager.getDefault();
-                                sms.sendTextMessage(bulkTelephone,null,MyMessage,null,null);
+                String MyMessage = SMS.getText().toString();
 
-                            }
+               // String[] groupSMS = new String[]{ContactsDatabase.ActorInfoEntry.COLUMN_ACTOR_PHONE};
 
-                            Toast.makeText(getApplicationContext(),"Message Sent successfully!",Toast.LENGTH_LONG).show();
-                            SMS.setText("");
+                if(ContextCompat.checkSelfPermission(GroupSMS.this, Manifest.permission.SEND_SMS)
+                        != PackageManager.PERMISSION_GRANTED){
+                    ActivityCompat.requestPermissions(GroupSMS.this, new String[]{Manifest.permission.SEND_SMS},1);
+                }else{
 
-                        }catch (IOException e){
-                            Log.v("MyActivity","Error reading data file on line " + line, e);
-                            e.printStackTrace();
+                    if(SpinnerRegion.getSelectedItem() == "All Regions"){
+
+                        if(SpinnerGroup.getSelectedItem() != "Select Position") {
+
+                        //InputStream is = getResources().openRawResource(R.raw.vl_staff);
+                        //BufferedReader reader = new BufferedReader( new InputStreamReader(is, StandardCharsets.UTF_8));
+
+                       // String line = "";
+                       // String bulkTelephone = "";
+
+                        /*
+
+                        /////////////////////////////
+                        // Step over headers
+                        reader.readLine();
+
+                        while ((line = reader.readLine()) != null){
+                            //split by ','
+                            String[] tokens = line.split(",");
+
+                            //read the data
+/
+                            bulkTelephone =  tokens[3] ;
+
+                            SmsManager sms = SmsManager.getDefault();
+                            sms.sendTextMessage(bulkTelephone,null,MyMessage,null,null);
+
+                        }*/
+
+                        //String query="SELECT id, name, roll FROM student WHERE name = ? AND roll = ?";
+                        //String[] selectionArgs = {"Amit","7"}
+                        //db.rawQuery(query, selectionArgs);
+
+
+
+                        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+
+                       String posName = SpinnerGroup.getSelectedItem().toString();
+                        Cursor res = db.rawQuery("select * from actor_information where actor_position =? ", new String[]{posName});
+                        while(res.moveToNext())
+                        {
+                            //line = line +1;
+                            String dbColumn = "actor_phone";
+                            int positionIndex = res.getColumnIndex(dbColumn);
+                            //res.getColumnIndex(res.getColumnName())
+                            String num = res.getString(positionIndex);
+                            SmsManager sms = SmsManager.getDefault();
+                            sms.sendTextMessage(num, null, MyMessage, null, null);
+                        }
+                        res.close();
+                        Toast.makeText(getApplicationContext(),"Message Sent successfully For all MFPs!",Toast.LENGTH_LONG).show();
+                        SMS.setText("");
+
+                       // Toast.makeText(getApplicationContext(),"Message Sent successfully!",Toast.LENGTH_LONG).show();
+                       // SMS.setText("");
                         }
 
-                    }else if (SpinnerGroup.getSelectedItem() == "MFP"){
+                    }
+                   /*
+                    else if (SpinnerGroup.getSelectedItem() == "MFP"){
                         InputStream is = getResources().openRawResource(R.raw.mfp);
                         BufferedReader reader = new BufferedReader( new InputStreamReader(is, StandardCharsets.UTF_8));
 
@@ -181,7 +366,7 @@ public class GroupSMS extends AppCompatActivity {
 
 
                             // Step over headers
-                            reader.readLine();
+                           // reader.readLine();
 
                             while ((line = reader.readLine()) != null){
                                 //split by ','
@@ -528,13 +713,36 @@ public class GroupSMS extends AppCompatActivity {
                     } else{
 
                         Toast.makeText(getApplicationContext(),"FAILED. NO list of individuals entered for this group yet.",Toast.LENGTH_LONG).show();
-                    }
+                    }*/
 
 
                 }
 
             }
         });
+
+    }
+
+    private void loadPositionData() {
+        SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
+
+        List<String> list1 = new ArrayList<>();
+        Cursor res = db.rawQuery("select actor_position from actor_position",null);
+        while(res.moveToNext())
+        {
+            //String dbColumn = "actor_position";
+            //int positionIndex = res.getColumnIndex(dbColumn);
+            String myList = res.getString(0);
+           list1.add(myList);
+
+        }
+        res.close();
+
+        ArrayAdapter<String> dataAdapter1 = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, list1);
+
+        dataAdapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        SpinnerGroup.setAdapter(dataAdapter1);
 
     }
 

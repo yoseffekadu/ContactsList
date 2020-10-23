@@ -33,6 +33,8 @@ import com.example.Contacts.ContactsDatabase.RegionInfoEntry;
 import com.example.Contacts.ContactsDatabase.ZoneInfoEntry;
 import com.example.Contacts.ContactsDatabase.DistrictInfoEntry;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -207,6 +209,9 @@ ActorSP.setAdapter(null);
                 ZoneSP.setAdapter(null);
                 DistrictSP.setAdapter(null);
                 ActorSP.setAdapter(null);
+                FullName.setText("");
+                PhoneNo.setText("");
+                Position.setText("");
             }else {
                 mAdaptorZone = new SimpleCursorAdapter(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, null,
                         new String[]{ZoneInfoEntry.COLUMN_ZONE_NAME}, new int[]{android.R.id.text1}, 0);
@@ -235,6 +240,9 @@ ActorSP.setAdapter(null);
              if (zoneName.equals("Select Zone") || zoneName.equals("")){
                  DistrictSP.setAdapter(null);
                  ActorSP.setAdapter(null);
+                 FullName.setText("");
+                 PhoneNo.setText("");
+                 Position.setText("");
              }else {
 
                  mAdaptorDistrict = new SimpleCursorAdapter(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, null,
@@ -263,9 +271,23 @@ ActorSP.setAdapter(null);
              String distnictName = cursor.getString(districtIndex);
              if (distnictName.equals("Select District") || distnictName.equals("")){
                  ActorSP.setAdapter(null);
+                 FullName.setText("");
+                 PhoneNo.setText("");
+                 Position.setText("");
              }else {
+
+                // String[] =actorInfo = ContactsDatabase.ActorInfoEntry.COLUMN_ACTOR_FIRST_NAME + " " + ContactsDatabase.ActorInfoEntry.COLUMN_ACTOR_LAST_NAME +
+                //         " (" + ContactsDatabase.ActorInfoEntry.COLUMN_ACTOR_POSITION + ")";
+
+                 //Cursor c = db.query(true,ContactsDatabase.ActorInfoEntry.TABLE_NAME,queryCols,adapterCols,null,null,null,null,null,null);
+
+
+                 String[] from = new String[] { ContactsDatabase.ActorInfoEntry.COLUMN_ACTOR_INFO,
+                         ContactsDatabase.ActorInfoEntry.COLUMN_ACTOR_PHONE};
+                 int[] to = new int[] { android.R.id.text1 };
+
                  mAdaptorActor = new SimpleCursorAdapter(MainActivity.this, android.R.layout.simple_spinner_item, null,
-                         new String[]{ContactsDatabase.ActorInfoEntry.COLUMN_ACTOR_INFO}, new int[]{android.R.id.text1}, 0);
+                         from, to, 0);
 
                  mAdaptorActor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                  ActorSP.setAdapter(mAdaptorActor);
@@ -289,17 +311,21 @@ ActorSP.setAdapter(null);
              int actorIndex = cursor.getColumnIndex(ContactsDatabase.ActorInfoEntry.COLUMN_ACTOR_INFO);
              String actorInfo = cursor.getString(actorIndex);
              String actorPhone = cursor.getString(actorIndex+1);
+
+             //String actorposition = cursor.getString(actorIndex + 3);
              if (actorInfo.equals("Select Actor") || actorInfo.equals("")){
                  FullName.setText("");
                  PhoneNo.setText("");
                  Position.setText("");
              }else {
 
+
+
                  //FullName.setText(actorInfo);
                  PhoneNo.setText(actorPhone);
 
                  String[] splitActorInfo = actorInfo.trim().split("\\s+");
-                 //int x = splitActorInfo.
+
                 String posit = splitActorInfo[splitActorInfo.length-1];
 
                 Position.setText(posit);
@@ -382,6 +408,8 @@ ActorSP.setAdapter(null);
 
         Cursor cursor = db.query(ContactsDatabase.ActorInfoEntry.TABLE_NAME,actorColumns,
                 whereClause, new String[]{districtName},null,null, null);
+
+
         mAdaptorActor.changeCursor(cursor);
     }
 
@@ -390,7 +418,7 @@ ActorSP.setAdapter(null);
 
         SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
 
-        Toast.makeText(MainActivity.this, "data enter", Toast.LENGTH_SHORT).show();
+       // Toast.makeText(MainActivity.this, "data enter", Toast.LENGTH_SHORT).show();
 
 
 
@@ -415,7 +443,7 @@ ActorSP.setAdapter(null);
     private void displayActorData(Actor actor) {
         String name = actor.getInfo();
         String phone = actor.getPhoneNumber();
-        String email = actor.getMail();
+        //String email = actor.getMail();
 
         //String actorData = "Full Name:              " + name + "\nLocation:                " + location + "\nPosition:                  " + pos + "\nPhone Number:     " + phone + "\nEmail:                     " + email;
         if (name == "Select Actor") {
@@ -447,6 +475,9 @@ ActorSP.setAdapter(null);
 
         }else if (id == R.id.nav_group_sms){
             Intent intent = new Intent(MainActivity.this, GroupSMS.class);
+            startActivity(intent);
+        }else if (id == R.id.nav_about){
+            Intent intent = new Intent(MainActivity.this, About.class);
             startActivity(intent);
         }
 

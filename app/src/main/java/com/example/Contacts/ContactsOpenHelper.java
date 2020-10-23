@@ -18,16 +18,20 @@ public class ContactsOpenHelper extends SQLiteOpenHelper{
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        db.execSQL(ContactsDatabase.PositionInfoEntry.SQL_CREATE_TABLE);
+        db.execSQL(ContactsDatabase.CountryInfoEntry.SQL_CREATE_TABLE);
         db.execSQL(ContactsDatabase.RegionInfoEntry.SQL_CREATE_TABLE);
         db.execSQL(ContactsDatabase.ZoneInfoEntry.SQL_CREATE_TABLE);
         db.execSQL(ContactsDatabase.DistrictInfoEntry.SQL_CREATE_TABLE);
         db.execSQL(ContactsDatabase.ActorInfoEntry.SQL_CREATE_TABLE);
 
         DatabaseData data = new DatabaseData(db);
+        data.insertCountries();
         data.insertRegions();
         data.insertZones();
         data.insertDistricts();
         data.insertActors();
+        data.insertPositions();
 
 
     }

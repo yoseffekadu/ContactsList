@@ -5,12 +5,12 @@ import androidx.annotation.NonNull;
 public class Actor {
     private String info;
     private String phoneNumber;
-    private String mail;
+    //private String mail;
 
     public Actor(String info, String phoneNumber, String mail) {
         this.info = info;
         this.phoneNumber = phoneNumber;
-        this.mail = mail;
+        //this.mail = mail;
     }
 
     public String getInfo() {
@@ -29,13 +29,13 @@ public class Actor {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getMail() {
-        return mail;
-    }
+    //public String getMail() {
+    ////    return mail;
+    //}
 
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
+    //public void setMail(String mail) {
+     //   this.mail = mail;
+    //}
 
     @NonNull
     @Override
